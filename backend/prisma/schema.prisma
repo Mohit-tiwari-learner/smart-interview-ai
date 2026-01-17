@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  avatarUrl String?  // Optional avatar URL
+  createdAt DateTime @default(now())
+  lastLogin DateTime @updatedAt
+  sessions  Session[]
+}
+
+model Session {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  question        String
+  durationSeconds Int
+  transcript      String    @db.Text
+  audioUrl        String?
+  videoUrl        String?
+  createdAt       DateTime  @default(now())
+  
+  analysis        Analysis?
+}
+
+model Analysis {
+  id              String   @id @default(uuid())
+  sessionId       String   @unique
+  session         Session  @relation(fields: [sessionId], references: [id])
+  overallScore    Int
+  confidenceScore Int
+  clarityScore    Int
+  relevanceScore  Int
+  wpm             Int
+  fillerWords     Json     // Array of objects: [{ word: "um", count: 2 }]
+  feedbackPoints  String[] // Array of strings
+  createdAt       DateTime @default(now())
+}
