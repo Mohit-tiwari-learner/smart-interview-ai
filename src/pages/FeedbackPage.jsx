@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
-import { Share2, ArrowRight, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
+import { Share2, ArrowRight, CheckCircle, AlertTriangle, FileText, Sparkles, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -38,6 +38,23 @@ const FeedbackPage = () => {
     const [analysis, setAnalysis] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Rewrite Logic
+    const [rewrittenAnswer, setRewrittenAnswer] = useState(null);
+    const [loadingRewrite, setLoadingRewrite] = useState(false);
+
+    const handleRewrite = async () => {
+        if (!analysis?.transcript) return;
+        setLoadingRewrite(true);
+        try {
+            const result = await analysisService.rewriteAnswer(analysis.transcript);
+            setRewrittenAnswer(result);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoadingRewrite(false);
+        }
+    };
+
     useEffect(() => {
         if (!currentSession) {
             navigate('/practice');
@@ -47,7 +64,19 @@ const FeedbackPage = () => {
         const fetchAnalysis = async () => {
             setLoading(true);
             try {
-                // Use the shared service
+                // Check if analysis already exists in the session to avoid re-generating (and potentially getting different mock results)
+                if (currentSession.analysis) {
+                    setAnalysis({
+                        ...currentSession.analysis,
+                        transcript: currentSession.transcript,
+                        duration: currentSession.duration,
+                        wpm: currentSession.analysis.wpm || Math.round((currentSession.transcript.split(' ').length / currentSession.duration) * 60) || 0
+                    });
+                    setLoading(false);
+                    return;
+                }
+
+                // Use the shared service if no analysis exists
                 const result = await analysisService.analyzeTranscript(
                     currentSession.transcript,
                     currentSession.question,
@@ -151,29 +180,126 @@ const FeedbackPage = () => {
                                 Transcript
                             </h3>
                             <div className="p-4 bg-slate-950/50 rounded-xl border border-white/5 text-slate-300 leading-relaxed max-h-60 overflow-y-auto">
-                                "{analysis.transcript}"
+                                {(() => {
+                                    if (!analysis.fillerWords || analysis.fillerWords.length === 0) return analysis.transcript;
+
+                                    // Create a safe regex pattern from filler words
+                                    const pattern = new RegExp(`\\b(${analysis.fillerWords.map(f => f.word).join('|')})\\b`, 'gi');
+
+                                    // Split and map matches
+                                    const parts = analysis.transcript.split(pattern);
+
+                                    return parts.map((part, i) => {
+                                        if (analysis.fillerWords.some(f => f.word.toLowerCase() === part.toLowerCase())) {
+                                            return <span key={i} className="text-red-400 bg-red-500/10 px-1 rounded decoration-wavy underline decoration-red-500/30" title="Filler Word">{part}</span>;
+                                        }
+                                        return part;
+                                    });
+                                })()}
                             </div>
-                            <div className="mt-2 text-xs text-slate-500 flex justify-end">
-                                Duration: {analysis.duration}s • {analysis.wpm} WPM
+                            <div className="mt-4 flex items-center justify-between">
+                                <span className="text-xs text-slate-500">
+                                    Duration: {analysis.duration}s • {analysis.wpm} WPM • <span className={`${analysis.durationFeedback?.includes('Good') ? 'text-green-400' : 'text-yellow-400'}`}>{analysis.durationFeedback || "Length: OK"}</span>
+                                </span>
+
+                                <Button
+                                    variant="outline"
+                                    className="text-xs py-1 h-auto flex items-center gap-1 text-primary-400 border-primary-500/20 hover:bg-primary-500/10"
+                                    onClick={handleRewrite}
+                                    disabled={loadingRewrite}
+                                >
+                                    <RefreshCw className={`w-3 h-3 ${loadingRewrite ? 'animate-spin' : ''}`} />
+                                    {rewrittenAnswer ? 'Regenerate Polish' : 'Polish Answer'}
+                                </Button>
                             </div>
+
+                            {/* Rewritten Answer Area */}
+                            {rewrittenAnswer && (
+                                <div className="mt-4 p-4 rounded-lg bg-green-500/10 border border-green-500/20 animate-in fade-in slide-in-from-top-2">
+                                    <h4 className="text-sm font-bold text-green-400 mb-2 flex items-center gap-2">
+                                        <Sparkles className="w-3 h-3" />
+                                        AI Refined Version
+                                    </h4>
+                                    <p className="text-slate-300 italic text-sm">
+                                        "{rewrittenAnswer}"
+                                    </p>
+                                </div>
+                            )}
                         </Card>
 
-                        <Card>
-                            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                                AI Feedback
-                            </h3>
-                            <div className="space-y-4">
-                                {analysis.feedback.map((item, i) => (
-                                    <div key={i} className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
-                                        <div className="w-1 h-full rounded-full bg-blue-500" />
-                                        <div>
-                                            <p className="text-slate-300 text-sm">{item}</p>
-                                        </div>
+                        {/* Strengths & Improvements */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Sentiment Analysis */}
+                            <Card className="bg-slate-900/50 border-white/5 p-4 flex flex-col justify-center gap-3 col-span-1 md:col-span-2">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                    <CheckCircle className="w-4 h-4" /> Sentiment Breakdown
+                                </h3>
+                                <div className="flex h-4 w-full rounded-full overflow-hidden">
+                                    <div style={{ width: `${analysis.sentiment?.positive || 33}%` }} className="bg-emerald-500 h-full" title="Positive" />
+                                    <div style={{ width: `${analysis.sentiment?.neutral || 33}%` }} className="bg-slate-500 h-full" title="Neutral" />
+                                    <div style={{ width: `${analysis.sentiment?.negative || 33}%` }} className="bg-red-500 h-full" title="Negative" />
+                                </div>
+                                <div className="flex justify-between text-xs text-slate-400 font-medium">
+                                    <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500" /> Pos {analysis.sentiment?.positive || 0}%</span>
+                                    <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-500" /> Neu {analysis.sentiment?.neutral || 0}%</span>
+                                    <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-red-500" /> Neg {analysis.sentiment?.negative || 0}%</span>
+                                </div>
+                            </Card>
+
+                            <Card className="border-t-4 border-t-green-500">
+                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                                    <CheckCircle className="w-5 h-5 text-green-500" />
+                                    Strengths
+                                </h3>
+                                <ul className="space-y-3">
+                                    {(analysis.strengths || []).map((item, i) => (
+                                        <li key={i} className="flex gap-3 text-sm text-slate-300">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5 shrink-0" />
+                                            {item}
+                                        </li>
+                                    ))}
+                                    {(!analysis.strengths || analysis.strengths.length === 0) && (
+                                        <li className="text-slate-500 italic">No specific strengths detected.</li>
+                                    )}
+                                </ul>
+                            </Card>
+
+                            <Card className="border-t-4 border-t-yellow-500">
+                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                                    Improvements
+                                </h3>
+                                <ul className="space-y-3">
+                                    {(analysis.improvements || []).map((item, i) => (
+                                        <li key={i} className="flex gap-3 text-sm text-slate-300">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-1.5 shrink-0" />
+                                            {item}
+                                        </li>
+                                    ))}
+                                    {(!analysis.improvements || analysis.improvements.length === 0) && (
+                                        <li className="text-slate-500 italic">No specific improvements detected.</li>
+                                    )}
+                                </ul>
+                            </Card>
+                        </div>
+
+                        {/* Suggested Next Topic */}
+                        {analysis.suggestedNextTopic && (
+                            <Card className="bg-gradient-to-r from-slate-900 to-slate-800 border-white/10">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Recommended Next Step</h3>
+                                        <p className="text-xl font-bold text-white flex items-center gap-2">
+                                            <Sparkles className="w-5 h-5 text-primary-400" />
+                                            {analysis.suggestedNextTopic}
+                                        </p>
                                     </div>
-                                ))}
-                            </div>
-                        </Card>
+                                    <Button onClick={() => navigate(ROUTES.PRACTICE)}>
+                                        Practice This Topic
+                                    </Button>
+                                </div>
+                            </Card>
+                        )}
                     </div>
 
                     {/* Sidebar Charts */}

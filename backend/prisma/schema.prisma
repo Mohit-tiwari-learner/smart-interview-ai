@@ -15,9 +15,15 @@ model User {
   email     String   @unique
   name      String
   avatarUrl String?  // Optional avatar URL
-  createdAt DateTime @default(now())
-  lastLogin DateTime @updatedAt
-  sessions  Session[]
+  createdAt       DateTime @default(now())
+  lastLogin       DateTime @updatedAt
+  
+  // Rate Limiting
+  isPro           Boolean  @default(false)
+  dailySessionCount Int      @default(0)
+  lastSessionDate DateTime @default(now())
+
+  sessions        Session[]
 }
 
 model Session {

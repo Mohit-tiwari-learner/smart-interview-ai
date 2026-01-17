@@ -26,8 +26,28 @@ export const createSession = async (req, res) => {
     try {
         const { question, durationSeconds, transcript, analysis } = req.body;
 
-        // Transaction to create Session and Analysis together
         const result = await prisma.$transaction(async (prisma) => {
+            // 1. Check & Enforce Rate Limit
+            const user = await prisma.user.findUnique({
+                where: { id: req.user.id }
+            });
+
+            if (!user) throw new Error("User not found");
+
+            const now = new Date();
+            const lastDate = new Date(user.lastSessionDate);
+            // Check if it's a different day (simple string comparison works for local timezone relative logic, 
+            // but for robust UTC handling, we might want to be more specific. 
+            // For now, simple date string comparison is sufficient for this scope)
+            const isSameDay = now.toDateString() === lastDate.toDateString();
+
+            let currentCount = isSameDay ? user.dailySessionCount : 0;
+
+            if (!user.isPro && currentCount >= 2) {
+                throw new Error("Daily free trial limit reached (2 sessions/day). Upgrade to Pro for unlimited access.");
+            }
+
+            // 2. Create Session
             const session = await prisma.session.create({
                 data: {
                     userId: req.user.id,
@@ -37,6 +57,16 @@ export const createSession = async (req, res) => {
                 }
             });
 
+            // 3. Update User UsageStats
+            await prisma.user.update({
+                where: { id: req.user.id },
+                data: {
+                    dailySessionCount: currentCount + 1,
+                    lastSessionDate: now
+                }
+            });
+
+            // 4. Create Analysis (if provided)
             if (analysis) {
                 await prisma.analysis.create({
                     data: {

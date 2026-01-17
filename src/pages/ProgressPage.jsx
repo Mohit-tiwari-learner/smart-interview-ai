@@ -10,16 +10,31 @@ const ProgressPage = () => {
     const navigate = useNavigate();
     const { sessions } = useAuth();
 
-    // Helper to calculate score (duplicated logic from FeedbackPage for now)
+    // Helper to calculate score (Use stored analysis if available, else fallback to heuristic)
     const calculateSessionMetrics = (session) => {
+        // If we have AI analysis, use that source of truth
+        if (session.analysis || session.score) {
+            return {
+                ...session,
+                score: session.analysis?.overallScore || session.score || 0,
+                wpm: session.analysis?.wpm || 0,
+                fillerCount: session.analysis?.fillerWords ?
+                    (Array.isArray(session.analysis.fillerWords) ?
+                        session.analysis.fillerWords.reduce((acc, curr) => acc + curr.count, 0) : 0
+                    ) : 0,
+                duration: session.duration || 0
+            };
+        }
+
+        // Fallback Heuristic (only for legacy/broken sessions)
         const { transcript, duration } = session;
-        const words = transcript.split(/\s+/).filter(w => w.length > 0);
+        const words = (transcript || "").split(/\s+/).filter(w => w.length > 0);
         const wordCount = words.length;
         const minutes = duration / 60;
         const wpm = minutes > 0 ? Math.round(wordCount / minutes) : 0;
 
         const fillerRegex = /\b(um|uh|like|basically|actually|literally)\b/gi;
-        const fillerCount = (transcript.match(fillerRegex) || []).length;
+        const fillerCount = ((transcript || "").match(fillerRegex) || []).length;
 
         let confidence = 100 - (fillerCount * 5);
         if (wpm < 100) confidence -= (100 - wpm) * 0.5;

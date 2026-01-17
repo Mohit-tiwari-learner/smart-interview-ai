@@ -1,16 +1,63 @@
-# React + Vite
+# 🚀 Agentic AI Interview Coach
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A next-generation, AI-powered interview preparation platform. It simulates real-world interviews (`Google`, `Amazon`, `Startups`), analyzes your answers with AI, detects "Hinglish" or filler words, and provides actionable feedback.
 
-Currently, two official plugins are available:
+**Built with:** React + Vite + TailwindCSS + Google Gemini AI + Web Speech API.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Key Features
 
-## React Compiler
+### 🎯 1. Realistic Practice Modes
+*   **HR Round**: Focuses on soft skills and culture fit.
+*   **Technical Round**: Drills into core concepts and problem solving.
+*   **Managerial / Stress**: (Premium 👑) Tests leadership & pressure handling.
+*   **Company Simulators**: (Premium 👑) Tailored for **Google** (Googliness) or **Amazon** (Leadership Principles).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🤖 2. Advanced AI Intelligence
+*   **Live Transcription**: Real-time speech-to-text.
+*   **Deep Analysis**: Scores your answer on Relevance, Clarity, and Confidence.
+*   **Grammar & Fillers**: Highlights "um", "like" and grammar mistakes.
+*   **Sentiment Analysis**: Visualizes Positive vs Negative tone.
+*   **Smart Nudges**: Remembers your last session (e.g. "You spoke too fast last time") and warns you before starting.
 
-## Expanding the ESLint configuration
+### 💎 3. Personalization & Monetization
+*   **Profile Context**: Accepts your **Resume/Bio** to generate role-specific questions.
+*   **Linguistics**: Detects "Hinglish" and offers a "Polish" feature to rewrite it into Global Professional English.
+*   **Gamification**: Tracks XP, Daily Streaks, and Daily Session Limits.
+*   **Freemium Model**: Includes an "Upgrade to Pro" flow for advanced features.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Tech Stack
+
+*   **Frontend**: React.js, TailwindCSS, Framer Motion (Animations), Recharts (Charts).
+*   **Backend**: Node.js, Express, Prisma (SQLite/Postgres).
+*   **AI**: Google Generative AI (`gemini-1.5-flash`).
+*   **Storage**: LocalStorage (MVP Persistence).
+
+## 🚀 Getting Started
+
+1.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
+
+2.  **Run Development Server**
+    ```bash
+    npm run dev
+    ```
+
+3.  **Start Backend (Optional for MVP)**
+    ```bash
+    cd backend
+    npm install
+    npx prisma migrate dev
+    npm start
+    ```
+
+## 📸 Screenshots
+*(Add screenshots of Practice Page, Feedback Dashboard, and Upgrade Modal here)*
+
+## 🤝 Contribution
+Open for PRs! Please check `task.md` for remaining Phase 7 ideas (Deployment, PWA).
+
+---
+**Status**: Feature Complete (MVP + Phase 2)
+**Version**: 1.2.0

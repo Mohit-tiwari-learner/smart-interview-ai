@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 if (email && password) {
-                    const mockUser = { id: '123', email, name: email.split('@')[0] };
+                    const mockUser = { id: '123', email, name: email.split('@')[0], isPro: false };
                     setUser(mockUser);
                     localStorage.setItem('user_session', JSON.stringify(mockUser));
 
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 if (otp === '1234') {
-                    const mockUser = { id: '123', email, name: email.split('@')[0] };
+                    const mockUser = { id: '123', email, name: email.split('@')[0], isPro: false };
                     setUser(mockUser);
                     localStorage.setItem('user_session', JSON.stringify(mockUser));
                     setSessions([]); // New user, empty sessions
@@ -114,9 +114,28 @@ export const AuthProvider = ({ children }) => {
             ...sessionData
         };
 
+        // Check for Daily Limit (Frontend Mock Check)
+        const today = new Date().toLocaleDateString('en-US');
+        const todaySessions = sessions.filter(s =>
+            new Date(s.timestamp).toLocaleDateString('en-US') === today
+        );
+
+        if (!user.isPro && todaySessions.length >= 2) {
+            throw new Error("Daily limit reached! Free plan includes 2 sessions per day. Upgrade to Pro for unlimited access.");
+        }
+
         setSessions(prev => [newSession, ...prev]);
         setCurrentSession(newSession); // Set this as the active session for Feedback page
         return newSession.id;
+    };
+
+    const updateUserProfile = (data) => {
+        return new Promise((resolve) => {
+            const updatedUser = { ...user, ...data };
+            setUser(updatedUser);
+            localStorage.setItem('user_session', JSON.stringify(updatedUser));
+            resolve(updatedUser);
+        });
     };
 
     return (
@@ -130,7 +149,8 @@ export const AuthProvider = ({ children }) => {
             verifyOtp,
             logout,
             saveSession,
-            setCurrentSession
+            setCurrentSession,
+            updateUserProfile
         }}>
             {children}
         </AuthContext.Provider>
