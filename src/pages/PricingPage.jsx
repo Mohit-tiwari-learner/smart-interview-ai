@@ -21,7 +21,7 @@ const PricingPage = () => {
                         <p className="text-slate-400">Perfect for trying out the platform.</p>
                     </div>
                     <div className="mb-8">
-                        <span className="text-4xl font-bold">$0</span>
+                        <span className="text-4xl font-bold">₹0</span>
                         <span className="text-slate-500">/month</span>
                     </div>
                     <ul className="space-y-4 mb-8">
@@ -50,7 +50,7 @@ const PricingPage = () => {
                         <p className="text-slate-400">For serious job seekers.</p>
                     </div>
                     <div className="mb-8">
-                        <span className="text-4xl font-bold">$19</span>
+                        <span className="text-4xl font-bold">₹1499</span>
                         <span className="text-slate-500">/month</span>
                     </div>
                     <ul className="space-y-4 mb-8">

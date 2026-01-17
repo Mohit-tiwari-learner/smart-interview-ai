@@ -10,104 +10,64 @@ const LandingPage = () => {
     return (
         <div className="min-h-screen">
             {/* Hero Section */}
-            <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
-                {/* Background Gradients */}
-                <div className="absolute top-0 center w-full h-full hero-gradient pointer-events-none" />
-                <div className="absolute top-20 right-0 w-72 h-72 md:w-[500px] md:h-[500px] bg-primary-500/20 rounded-full blur-[100px] animate-blob" />
-                <div className="absolute bottom-0 left-0 w-72 h-72 md:w-[500px] md:h-[500px] bg-secondary-500/10 rounded-full blur-[100px] animate-blob animation-delay-2000" />
+            {/* Hero Section */}
+            <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden min-h-screen flex items-center">
 
-                <div className="max-w-7xl mx-auto px-6 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-primary-300 mb-6">
-                                <span className="flex h-2 w-2 rounded-full bg-primary-400 animate-pulse" />
-                                AI-Powered Interview Coach
-                            </div>
-                            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                                Master Your <br />
-                                <span className="gradient-text">Interview Skills</span>
-                            </h1>
-                            <p className="text-lg text-slate-300 mb-8 max-w-lg leading-relaxed">
-                                Practice with our AI interviewer, get instant feedback on your confidence, clarity, and relevance, and land your dream job.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <Link to={ROUTES.PRACTICE}>
-                                    <Button size="lg" className="w-full sm:w-auto">
-                                        Start Free Practice <ArrowRight className="ml-2 w-5 h-5" />
-                                    </Button>
-                                </Link>
-                                <Link to="#how-it-works">
-                                    <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                                        <Play className="mr-2 w-5 h-5" /> See How It Works
-                                    </Button>
-                                </Link>
-                            </div>
+                {/* Full Screen Background Image */}
+                <div className="absolute inset-0 z-0">
+                    <img
+                        src="/hero-bg.jpg"
+                        alt="Background"
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-slate-950/80 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-900/40" />
+                </div>
 
-                            <div className="mt-12 flex items-center gap-6 text-sm text-slate-500">
-                                <div className="flex -space-x-3">
-                                    {[1, 2, 3, 4].map(i => (
-                                        <div key={i} className="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-950 flex items-center justify-center text-xs text-white">
-                                            User
-                                        </div>
-                                    ))}
-                                </div>
-                                <p>Trusted by 10,000+ candidates</p>
-                            </div>
-                        </motion.div>
+                {/* Background Gradients (Overlaying the image slightly for effect) */}
+                <div className="absolute top-0 center w-full h-full hero-gradient pointer-events-none opacity-40 mix-blend-overlay z-1" />
 
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            className="relative"
-                        >
-                            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent z-10" />
-                                <img
-                                    src="/hero-bg.jpg"
-                                    alt="AI Interview Interface"
-                                    className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                />
+                <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="flex flex-col items-center"
+                    >
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-medium text-primary-200 mb-6 backdrop-blur-md">
+                            <span className="flex h-2 w-2 rounded-full bg-primary-400 animate-pulse" />
+                            AI-Powered Interview Coach
+                        </div>
+                        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white drop-shadow-2xl">
+                            Master Your <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-secondary-400">Interview Skills</span>
+                        </h1>
+                        <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-2xl leading-relaxed drop-shadow-md">
+                            Practice with our AI interviewer, get instant feedback on your confidence, clarity, and relevance, and land your dream job.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Link to={ROUTES.PRACTICE}>
+                                <Button size="lg" className="w-full sm:w-auto px-8 py-4 text-lg shadow-xl shadow-primary-500/20">
+                                    Start Free Practice <ArrowRight className="ml-2 w-5 h-5" />
+                                </Button>
+                            </Link>
+                            <Link to="#how-it-works">
+                                <Button variant="secondary" size="lg" className="w-full sm:w-auto px-8 py-4 bg-white/10 border-white/20 hover:bg-white/20 backdrop-blur-md">
+                                    <Play className="mr-2 w-5 h-5" /> See How It Works
+                                </Button>
+                            </Link>
+                        </div>
 
-                                {/* Floating API Analysis Cards */}
-                                <motion.div
-                                    initial={{ x: 20, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    transition={{ delay: 1, duration: 0.5 }}
-                                    className="absolute bottom-8 left-8 right-8 z-20"
-                                >
-                                    <Card className="bg-slate-950/80 backdrop-blur-xl border-white/20 p-4">
-                                        <div className="flex items-center gap-4 mb-3">
-                                            <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
-                                                <Zap className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-semibold text-white">Analysis Complete</h4>
-                                                <p className="text-xs text-slate-400">Just now</p>
-                                            </div>
-                                            <div className="ml-auto text-right">
-                                                <span className="text-2xl font-bold text-green-400">92%</span>
-                                                <p className="text-xs text-slate-400">Score</p>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-xs text-slate-300">
-                                                <span>Confidence</span>
-                                                <span className="text-white">High</span>
-                                            </div>
-                                            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                                                <div className="h-full bg-primary-500 w-[92%]" />
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </motion.div>
+                        <div className="mt-12 flex items-center justify-center gap-6 text-sm text-slate-300 font-medium">
+                            <div className="flex -space-x-3">
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} className="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-950 flex items-center justify-center text-xs text-white">
+                                        User
+                                    </div>
+                                ))}
                             </div>
-                        </motion.div>
-                    </div>
+                            <p className="drop-shadow-md">Trusted by 10,000+ candidates</p>
+                        </div>
+                    </motion.div>
                 </div>
             </section>
 

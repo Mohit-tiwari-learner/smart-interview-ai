@@ -65,7 +65,7 @@ const UpgradeModal = ({ isOpen, onClose, featureName = "This feature" }) => {
                         </div>
 
                         <Button className="w-full h-12 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-400 hover:to-orange-500 text-black font-bold text-base shadow-lg shadow-yellow-500/20">
-                            Get Pro - ₹499/mo
+                            Get Pro - ₹1499/mo
                         </Button>
                         <p className="mt-3 text-[10px] text-slate-500">
                             Cancel anytime. 7-day money-back guarantee.
